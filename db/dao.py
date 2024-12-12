@@ -5,6 +5,8 @@ from sqlalchemy import select
 from typing import List, Dict, Any, Optional
 from sqlalchemy.exc import SQLAlchemyError
 from json import loads as jsloads
+from datetime import datetime
+from .filterdate import Filterdates
 
 @connection
 async def set_user(session, tg_id: int, username: str, full_name: str) -> Optional[User]:
@@ -46,20 +48,25 @@ async def process_text(session, tg_id: int, text: str, photo: str):
 		#	return "Хорошо, напомню"
 		
 	except SQLAlchemyError as e:
-		logger.error(f"Ошибка при получении состояния пользователя: {e}")
+		logger.error(f"Ошибка при записи сообщения: {e}")
 		await session.rollback()	
 
 @connection
 async def show_posts(session, tg_id: int, date: str):
+	logger.info("запрос постов: "+date)
 	try:
-		posts = await session.scalars(select(Message).filter_by(user_id=tg_id))
+		dates=Filterdates(date)
+		posts = await session.scalars(select(Message).filter(Message.user_id==tg_id,Message.created_at.between(dates.frm,dates.to)))
 		ans=""
 		for post in posts:
 			ans+=str(post.created_at)+"\n"
 			ans+=post.text+"\n\n"
-		return ans
+		if ans==""
+			return "Нет сообщений на дату "+date
+		else:
+			return ans
 	except SQLAlchemyError as e:
-		logger.error(f"Ошибка при получении состояния пользователя: {e}")
+		logger.error(f"Ошибка при показе постов: {e}")
 		await session.rollback()	
 	pass
 	

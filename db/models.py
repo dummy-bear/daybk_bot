@@ -49,3 +49,12 @@ class Userstate(Base):
 	user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=True)
 	state: Mapped[dict | None] = mapped_column(JSON)
 	
+# Модель для напоминалок
+class Reminder(Base):
+	__tablename__ = 'reminders'
+	
+	id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+	user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=True)
+	remind_at: Mapped[datetime] = mapped_column(server_default=func.now())
+	remind_next: Mapped[timedelta]
+	text: Mapped[str]

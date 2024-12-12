@@ -1,4 +1,5 @@
 botenv
+files
 .env
 **/__pycache__/
 
