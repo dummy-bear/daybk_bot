@@ -1,7 +1,7 @@
-from sqlalchemy import BigInteger, Integer, Text, ForeignKey, String, JSON
+from sqlalchemy import BigInteger, Integer, Text, ForeignKey, String, JSON, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
+from datetime import datetime, timedelta
 from .database import Base
-
 
 # Модель для таблицы пользователей
 class User(Base):
@@ -14,7 +14,7 @@ class User(Base):
     # Связи с заметками и фотографиями
 	messages: Mapped[list["Message"]] = relationship("Message", back_populates="user", cascade="all, delete-orphan")
 	photos: Mapped[list["Photo"]] = relationship("Photo", back_populates="user", cascade="all, delete-orphan")
-	
+	reminders: Mapped[list["Reminder"]] = relationship("Reminder", back_populates="user", cascade="all, delete-orphan")
 	
 
 #Модель для фотографий
@@ -56,5 +56,8 @@ class Reminder(Base):
 	id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
 	user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=True)
 	remind_at: Mapped[datetime] = mapped_column(server_default=func.now())
-	remind_next: Mapped[timedelta]
+	remind_next: Mapped[timedelta] = mapped_column(nullable=True)
 	text: Mapped[str]
+	reminded: Mapped[bool]
+
+	user: Mapped["User"] = relationship("User", back_populates="reminders")

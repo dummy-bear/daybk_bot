@@ -3,10 +3,9 @@ from datetime import datetime, timedelta
 
 class Filterdates():
 	def __init__(self, s):
-		self.frm = parse(s.split()[1],dayfirst=True)
+		self.frm = parse(s,dayfirst=True, fuzzy=True)
 		self.to = self.frm + timedelta(days=1)
 		
 	def __str__(self):
-		s=self.frm+" - "+self.to
+		s=str(self.frm)+" - "+str(self.to)
 		return s
-

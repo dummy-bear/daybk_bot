@@ -33,12 +33,13 @@ class Reminder(Base):
 	id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
 	user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=True)
 	remind_at: Mapped[datetime] = mapped_column(server_default=func.now())
-	remind_next: Mapped[timedelta]
+	remind_next: Mapped[timedelta] = mapped_column(nullable=True)
 	text: Mapped[str]
+	reminded: Mapped[bool]
 	created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 	updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 	
-	user: Mapped[list["User"]] = relationship("User", back_populates="reminders", cascade="all, delete-orphan")
+	user: Mapped["User"] = relationship("User", back_populates="reminders")
 	
 Base.metadata.create_all(engine)
 engine.connect()
